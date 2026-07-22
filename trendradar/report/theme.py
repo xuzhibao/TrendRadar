@@ -502,8 +502,8 @@ def get_report_theme_css(accent: str = "#ec4899") -> str:
             .header-title {{ font-size: 30px; }}
             .brand-mark {{ width: 50px; height: 50px; flex-basis: 50px; }}
             .save-buttons {{ gap: 6px; }}
-            .guide-link, .save-btn, .toggle-dark-btn {{ min-width: 42px; width: 42px; min-height: 42px; }}
-            .save-dropdown-trigger {{ min-width: 36px; width: 36px; min-height: 42px; }}
+            .guide-link, .save-btn, .toggle-dark-btn {{ min-width: 44px; width: 44px; min-height: 44px; }}
+            .save-dropdown-trigger {{ min-width: 44px; width: 44px; min-height: 44px; }}
         }}
         @media (prefers-reduced-motion: reduce) {{
             html {{ scroll-behavior: auto; }}
