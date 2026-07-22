@@ -55,11 +55,12 @@ def render_html_content(
 
     html = """
     <!DOCTYPE html>
-    <html>
+    <html lang="zh-CN">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>热点新闻分析</title>
+        <meta name="theme-color" content="#5b21b6">
+        <title>TrendRadar · AI 热点情报</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             * { box-sizing: border-box; }
@@ -1416,13 +1417,14 @@ def render_html_content(
         <div class="reading-progress"></div>
         <div class="container">
             <div class="header">
-                <div class="header-watermark">TrendRadar</div>
+                <div class="header-watermark" aria-hidden="true">TREND / RADAR</div>
                 <div class="save-buttons">
-                    <button class="toggle-wide-btn" onclick="toggleWideMode()" title="切换宽屏/窄屏">⛶</button>
-                    <button class="toggle-dark-btn" onclick="toggleDarkMode()" title="切换暗色/亮色">☽</button>
+                    <a class="guide-link" href="https://github.com/xuzhibao/TrendRadar/blob/master/PUSH_SETUP.md" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span>推送设置</span></a>
+                    <button class="toggle-wide-btn" onclick="toggleWideMode()" title="切换宽屏/窄屏" aria-label="切换宽屏或窄屏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></button>
+                    <button class="toggle-dark-btn" onclick="toggleDarkMode()" title="切换暗色/亮色" aria-label="切换暗色或亮色主题"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 019.8 3.5 8.5 8.5 0 1020.5 14.2z"/></svg></button>
                     <div class="save-btn-group">
-                        <button class="save-btn" onclick="saveAsImage(event)">导出</button>
-                        <button class="save-dropdown-trigger">▾</button>
+                        <button class="save-btn" onclick="saveAsImage(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M5 21h14"/></svg><span>导出</span></button>
+                        <button class="save-dropdown-trigger" aria-label="打开导出菜单"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
                         <div class="save-dropdown-menu">
                             <button class="save-dropdown-item" onclick="saveAsImage(event)"><svg class="dropdown-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><circle cx="8" cy="7.5" r="2.5"/><path d="M12 4h.01"/></svg>整页截图</button>
                             <button class="save-dropdown-item" onclick="saveAsMultipleImages(event)"><svg class="dropdown-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="10" height="10" rx="1.5"/><path d="M5 4V2.5A1.5 1.5 0 016.5 1h7A1.5 1.5 0 0115 2.5v7a1.5 1.5 0 01-1.5 1.5H12"/></svg>分段截图</button>
@@ -1430,7 +1432,14 @@ def render_html_content(
                         </div>
                     </div>
                 </div>
-                <div class="header-title">热点新闻分析</div>
+                <div class="brand-lockup">
+                    <div class="brand-mark" aria-hidden="true"><span>TR</span></div>
+                    <div class="brand-copy">
+                        <div class="brand-kicker">AI TREND INTELLIGENCE</div>
+                        <h1 class="header-title">热点，不止于看见</h1>
+                        <p class="header-subtitle">聚合全网信号，用 AI 提炼今天真正值得关注的变化。</p>
+                    </div>
+                </div>
                 <div class="header-info">"""
 
     html = html.replace("</style>", f"{get_report_theme_css()}</style>", 1)
@@ -1561,14 +1570,15 @@ def render_html_content(
 
             <div class="content">
                 <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="搜索新闻标题..." oninput="handleSearch(this.value)">
+                    <label class="search-label" for="trend-search">搜索情报</label>
+                    <input id="trend-search" type="search" class="search-input" placeholder="搜索标题、平台或关键词…" oninput="handleSearch(this.value)" autocomplete="off">
                 </div>"""
 
     # 处理失败ID错误信息
     if report_data["failed_ids"]:
         html += """
                 <div class="error-section">
-                    <div class="error-title">⚠️ 请求失败的平台</div>
+                    <div class="error-title">请求失败的平台</div>
                     <ul class="error-list">"""
         for id_value in report_data["failed_ids"]:
             html += f'<li class="error-item">{html_escape(id_value)}</li>'
@@ -1661,9 +1671,9 @@ def render_html_content(
                     trend = calculate_rank_trend(rank_timeline, ranks)
                     trend_html = ""
                     if trend == "up":
-                        trend_html = '<span class="trend-up">📈</span>'
+                        trend_html = '<span class="trend-up" aria-label="排名上升">↗</span>'
                     elif trend == "down":
-                        trend_html = '<span class="trend-down">📉</span>'
+                        trend_html = '<span class="trend-down" aria-label="排名下降">↘</span>'
 
                     stats_html += f'<span class="rank-num {rank_class}">{rank_text}</span>{trend_html}'
 

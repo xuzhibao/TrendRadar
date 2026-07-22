@@ -39,11 +39,12 @@ def render_rss_html_content(
     """
     html = """
     <!DOCTYPE html>
-    <html>
+    <html lang="zh-CN">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>RSS 订阅内容</title>
+        <meta name="theme-color" content="#5b21b6">
+        <title>TrendRadar · RSS 情报流</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             * { box-sizing: border-box; }
@@ -294,9 +295,17 @@ def render_rss_html_content(
         <div class="container">
             <div class="header">
                 <div class="save-buttons">
-                    <button class="save-btn" onclick="saveAsImage()">保存为图片</button>
+                    <a class="guide-link" href="https://github.com/xuzhibao/TrendRadar/blob/master/PUSH_SETUP.md" target="_blank" rel="noopener noreferrer">推送设置</a>
+                    <button class="save-btn" onclick="saveAsImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M5 21h14"/></svg><span>保存图片</span></button>
                 </div>
-                <div class="header-title">RSS 订阅内容</div>
+                <div class="brand-lockup">
+                    <div class="brand-mark" aria-hidden="true"><span>RSS</span></div>
+                    <div class="brand-copy">
+                        <div class="brand-kicker">CURATED SIGNALS</div>
+                        <h1 class="header-title">你的精选情报流</h1>
+                        <p class="header-subtitle">更少噪音，更完整的上下文。</p>
+                    </div>
+                </div>
                 <div class="header-info">
                     <div class="info-item">
                         <span class="info-label">订阅条目</span>
