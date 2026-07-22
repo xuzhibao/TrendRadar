@@ -93,7 +93,10 @@ class AIClient:
 
         # 提取响应内容
         # 某些模型/提供商返回 list（内容块）而非 str，统一转为 str
-        content = response.choices[0].message.content
+        message = response.choices[0].message
+        content = message.content
+        if not content:
+            content = getattr(message, "reasoning_content", None)
         if isinstance(content, list):
             content = "\n".join(
                 item.get("text", str(item)) if isinstance(item, dict) else str(item)
