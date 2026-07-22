@@ -73,6 +73,8 @@ def get_report_theme_css(accent: str = "#22c55e") -> str:
             touch-action: manipulation;
         }}
         .save-btn:hover, .save-dropdown-trigger:hover, .toggle-wide-btn:hover, .toggle-dark-btn:hover {{ background: rgba(255, 255, 255, 0.20); }}
+        .save-dropdown-item {{ min-height: 44px; }}
+        .tab-arrow {{ min-width: 44px; min-height: 44px; }}
         button:focus-visible, a:focus-visible, input:focus-visible {{ outline: 3px solid #38bdf8; outline-offset: 3px; }}
         .content {{ padding: clamp(22px, 4.5vw, 48px); }}
         .word-group, .feed-group, .new-section, .rss-section, .standalone-section, .ai-section {{ scroll-margin-top: 20px; }}
