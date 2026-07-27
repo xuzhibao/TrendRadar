@@ -9,6 +9,8 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
             --paper: #f7f3eb;
             --paper-deep: #eee8dc;
             --paper-soft: #fbf9f4;
+            --paper-overlay: rgba(247, 243, 235, .94);
+            --paper-overlay-strong: rgba(247, 243, 235, .95);
             --ink: #302b25;
             --ink-soft: #6e675e;
             --ink-faint: #968e82;
@@ -288,7 +290,7 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
             margin: 0 0 34px;
             padding: 12px 0;
             border-bottom: 1px solid var(--rule);
-            background: color-mix(in srgb, var(--paper) 94%, transparent);
+            background: var(--paper-overlay);
             backdrop-filter: blur(8px);
         }}
         .search-label {{
@@ -368,7 +370,7 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
             margin: 0 0 30px;
             padding: 8px 0;
             border-bottom: 1px solid var(--rule);
-            background: color-mix(in srgb, var(--paper) 95%, transparent);
+            background: var(--paper-overlay-strong);
             backdrop-filter: blur(8px);
         }}
         .tab-bar {{
@@ -837,6 +839,8 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
             --paper: #201e1a;
             --paper-deep: #171612;
             --paper-soft: #28251f;
+            --paper-overlay: rgba(32, 30, 26, .94);
+            --paper-overlay-strong: rgba(32, 30, 26, .95);
             --ink: #eee8dc;
             --ink-soft: #c5bbae;
             --ink-faint: #92887d;
@@ -869,7 +873,7 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
         }}
         body.dark-mode .search-bar,
         body.dark-mode .tab-bar-wrapper {{
-            background: color-mix(in srgb, var(--paper) 94%, transparent);
+            background: var(--paper-overlay);
         }}
         body.dark-mode .search-input,
         body.dark-mode .guide-link,
