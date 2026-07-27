@@ -72,6 +72,7 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
 
         .container {{
             width: min(100%, 1080px);
+            max-width: 1080px;
             min-height: 100dvh;
             margin: 0 auto;
             padding: 72px 80px 56px;
@@ -480,8 +481,12 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
         .standalone-item {{
             display: flex;
             gap: 14px;
+            align-items: flex-start;
+            margin: 0;
             padding: 13px 2px;
+            border: 0;
             border-bottom: 1px solid var(--rule-soft);
+            border-radius: 0;
             background: transparent;
             transition: background 160ms var(--ease);
         }}
@@ -513,6 +518,20 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
             min-width: 0;
             flex: 1;
             padding: 0;
+        }}
+        .news-item.new .news-content {{
+            padding-right: 0;
+        }}
+        .news-item.new::after {{
+            top: 13px;
+            right: 2px;
+            padding: 0;
+            border-radius: 0;
+            background: var(--paper);
+            color: var(--danger);
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 9px;
+            letter-spacing: .08em;
         }}
         .news-header,
         .rss-meta {{
@@ -574,6 +593,7 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
         .rss-link,
         .standalone-item a {{
             color: var(--link);
+            font-family: inherit;
             font-weight: 500;
             text-decoration: none;
         }}
@@ -619,6 +639,13 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
             font-size: 17px;
             font-weight: 700;
             line-height: 1.5;
+        }}
+        .feed-name,
+        .standalone-name {{
+            color: var(--ink);
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 17px;
+            font-weight: 700;
         }}
         .new-item-rank {{
             color: var(--ink-faint);

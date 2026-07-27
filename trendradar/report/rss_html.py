@@ -311,7 +311,7 @@ def render_rss_html_content(
                         <span class="info-label">订阅条目</span>
                         <span class="info-value">"""
 
-    html = html.replace("</style>", f"{get_report_theme_css('#10b981')}</style>", 1)
+    html = html.replace("</style>", f"{get_report_theme_css()}</style>", 1)
 
     html += f"{total_count} 条"
 
