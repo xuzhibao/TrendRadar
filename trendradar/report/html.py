@@ -1435,9 +1435,9 @@ def render_html_content(
                 <div class="brand-lockup">
                     <div class="brand-mark" aria-hidden="true"><span>TR</span></div>
                     <div class="brand-copy">
-                        <div class="brand-kicker">AI TREND INTELLIGENCE</div>
-                        <h1 class="header-title">热点，不止于看见</h1>
-                        <p class="header-subtitle">聚合全网信号，用 AI 提炼今天真正值得关注的变化。</p>
+                        <div class="brand-kicker">TRENDRADAR DAILY</div>
+                        <h1 class="header-title">TrendRadar 人工智能日报</h1>
+                        <p class="header-subtitle">全网热点、RSS 与 AI 研判的每日编辑摘要</p>
                     </div>
                 </div>
                 <div class="header-info">"""

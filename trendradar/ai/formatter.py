@@ -290,7 +290,7 @@ def render_ai_analysis_html_rich(result: AIAnalysisResult) -> str:
         if result.skipped:
             return f"""
                 <div class="ai-section">
-                    <div class="ai-info">ℹ️ {_escape_html(str(result.error))}</div>
+                    <div class="ai-info">{_escape_html(str(result.error))}</div>
                 </div>"""
         error_msg = result.error or "未知错误"
         return f"""
@@ -301,7 +301,7 @@ def render_ai_analysis_html_rich(result: AIAnalysisResult) -> str:
     ai_html = """
                 <div class="ai-section">
                     <div class="ai-section-header">
-                        <div class="ai-section-title">✨ AI 热点分析</div>
+                        <div class="ai-section-title">AI 热点分析</div>
                         <span class="ai-section-badge">AI</span>
                     </div>
                     <div class="ai-blocks-grid">"""

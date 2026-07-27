@@ -301,9 +301,9 @@ def render_rss_html_content(
                 <div class="brand-lockup">
                     <div class="brand-mark" aria-hidden="true"><span>RSS</span></div>
                     <div class="brand-copy">
-                        <div class="brand-kicker">CURATED SIGNALS</div>
-                        <h1 class="header-title">你的精选情报流</h1>
-                        <p class="header-subtitle">更少噪音，更完整的上下文。</p>
+                        <div class="brand-kicker">TRENDRADAR RSS</div>
+                        <h1 class="header-title">TrendRadar RSS 情报日报</h1>
+                        <p class="header-subtitle">按来源整理的订阅更新与内容摘要</p>
                     </div>
                 </div>
                 <div class="header-info">
