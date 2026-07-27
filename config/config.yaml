@@ -226,11 +226,10 @@ display:
   # 调整顺序：剪切粘贴整行即可
   # 要显示某个区域，需同时：1. 在此列表中  2. 下方 regions 对应开关为 true
   region_order:
-    - new_items                           # 1️⃣ 新增热点区域
-    - hotlist                             # 2️⃣ 热榜区域（关键词匹配 / AI 智能筛选）
-    - rss                                 # 3️⃣ RSS 订阅区域
-    - standalone                          # 4️⃣ 独立展示区
-    - ai_analysis                         # 5️⃣ AI 分析区域
+    - ai_analysis                         # 1️⃣ AI 总结与简述
+    - hotlist                             # 2️⃣ 对应热点标题链接
+    - new_items                           # 3️⃣ 新增热点区域（当前关闭）
+    - standalone                          # 4️⃣ 独立展示区（当前关闭）
 
   # 推送区域开关（需配合上方 region_order 使用）
   regions:
@@ -238,7 +237,7 @@ display:
     new_items: false                  # 新增热点区域：含热榜新增 + RSS 新增（true=显示, false=隐藏）
                                       # 注：热点词汇统计中的新增标记🆕不受此配置影响
 
-    rss: true                         # RSS 订阅区域（true=显示并分析, false=隐藏并跳过分析）
+    rss: false                        # 不再单独铺开 RSS 热点列表，避免与 AI 总结后的标题重复
     standalone: false                 # 独立展示区：完整热榜/RSS，不受关键词过滤（true=显示, false=隐藏）
     ai_analysis: true                 # AI 分析区域（true=显示, false=隐藏）
 
