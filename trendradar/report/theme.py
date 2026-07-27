@@ -407,6 +407,26 @@ def get_report_theme_css(accent: str = "#1f6fb2") -> str:
         .hotlist-section {{
             display: block;
         }}
+        .hotlist-heading {{
+            margin: 0 0 18px;
+            padding: 0 0 12px;
+            border-bottom: 1px solid var(--rule);
+        }}
+        .hotlist-heading h2 {{
+            margin: 0;
+            color: var(--ink);
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.45;
+        }}
+        .hotlist-heading p {{
+            margin: 5px 0 0;
+            color: var(--ink-faint);
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 12px;
+            line-height: 1.6;
+        }}
         .word-group {{
             margin: 0 0 44px;
             overflow: visible;

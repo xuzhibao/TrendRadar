@@ -1570,6 +1570,12 @@ def render_html_content(
 
             <div class="content">"""
 
+    search_html = """
+                    <div class="search-bar">
+                        <label class="search-label" for="trend-search">搜索情报</label>
+                        <input id="trend-search" type="search" class="search-input" placeholder="搜索标题、平台或关键词…" oninput="handleSearch(this.value)" autocomplete="off">
+                    </div>"""
+
     # 处理失败ID错误信息
     if report_data["failed_ids"]:
         html += """
@@ -1716,7 +1722,13 @@ def render_html_content(
     # 给热榜统计添加外层包装
     if stats_html:
         stats_html = f"""
-                <div class="hotlist-section">{tab_bar_html}{stats_html}
+                <div class="hotlist-section">
+                    <div class="hotlist-heading">
+                        <h2>相关标题链接</h2>
+                        <p>按主题整理的热点来源与原文入口</p>
+                    </div>
+                    {search_html}
+                    {tab_bar_html}{stats_html}
                 </div>"""
 
     # 生成新增新闻区域的HTML
@@ -2159,12 +2171,6 @@ def render_html_content(
         "ai_analysis": ai_html,
     }
 
-    search_html = """
-                <div class="search-bar">
-                    <label class="search-label" for="trend-search">搜索情报</label>
-                    <input id="trend-search" type="search" class="search-input" placeholder="搜索标题、平台或关键词…" oninput="handleSearch(this.value)" autocomplete="off">
-                </div>"""
-
     def add_section_divider(content: str) -> str:
         """为内容的外层 div 添加 section-divider 类"""
         if not content or 'class="' not in content:
@@ -2177,13 +2183,8 @@ def render_html_content(
 
     # 按 region_order 顺序组装内容，动态添加分割线
     has_previous_content = False
-    search_added = False
     for region in region_order:
         content = region_contents.get(region, "")
-        # AI 摘要优先；搜索紧随摘要，之后才进入标题链接列表。
-        if region != "ai_analysis" and not search_added:
-            html += search_html
-            search_added = True
         if region == "new_items":
             # 特殊处理 new_items 区域（包含热榜新增和 RSS 新增两部分）
             new_html, rss_new = content
@@ -2202,12 +2203,6 @@ def render_html_content(
                 content = add_section_divider(content)
             html += content
             has_previous_content = True
-            if region == "ai_analysis" and not search_added:
-                html += search_html
-                search_added = True
-
-    if not search_added:
-        html += search_html
 
     html += """
             </div>
