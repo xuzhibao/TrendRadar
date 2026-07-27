@@ -45,7 +45,7 @@ def render_rss_html_content(
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="theme-color" content="#5b21b6">
         <title>TrendRadar · RSS 情报流</title>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             * { box-sizing: border-box; }
             body {
@@ -296,7 +296,7 @@ def render_rss_html_content(
             <div class="header">
                 <div class="save-buttons">
                     <a class="guide-link" href="https://github.com/xuzhibao/TrendRadar/blob/master/PUSH_SETUP.md" target="_blank" rel="noopener noreferrer">推送设置</a>
-                    <button class="save-btn" onclick="saveAsImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M5 21h14"/></svg><span>保存图片</span></button>
+                    <button class="save-btn" onclick="saveAsImage(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M5 21h14"/></svg><span>保存图片</span></button>
                 </div>
                 <div class="brand-lockup">
                     <div class="brand-mark" aria-hidden="true"><span>RSS</span></div>
@@ -416,13 +416,68 @@ def render_rss_html_content(
         </div>
 
         <script>
-            async function saveAsImage() {
-                const button = event.target;
-                const originalText = button.textContent;
+            var html2canvasLoadingPromise = null;
+
+            function loadExportScript(src) {
+                return new Promise(function(resolve, reject) {
+                    var script = document.createElement('script');
+                    var timer = setTimeout(function() {
+                        script.remove();
+                        reject(new Error('加载超时'));
+                    }, 12000);
+                    script.src = src;
+                    script.crossOrigin = 'anonymous';
+                    script.referrerPolicy = 'no-referrer';
+                    script.onload = function() {
+                        clearTimeout(timer);
+                        if (typeof window.html2canvas === 'function') resolve();
+                        else reject(new Error('脚本未提供 html2canvas'));
+                    };
+                    script.onerror = function() {
+                        clearTimeout(timer);
+                        script.remove();
+                        reject(new Error('脚本加载失败'));
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+
+            async function ensureHtml2Canvas() {
+                if (typeof window.html2canvas === 'function') return window.html2canvas;
+                if (html2canvasLoadingPromise) return html2canvasLoadingPromise;
+                html2canvasLoadingPromise = (async function() {
+                    var sources = [
+                        'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+                        'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js',
+                        'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
+                    ];
+                    var lastError = null;
+                    for (var i = 0; i < sources.length; i++) {
+                        try {
+                            await loadExportScript(sources[i]);
+                            return window.html2canvas;
+                        } catch (error) {
+                            lastError = error;
+                        }
+                    }
+                    throw new Error('导出组件加载失败，请检查网络后重试。' + (lastError ? ' ' + lastError.message : ''));
+                })();
+                try {
+                    return await html2canvasLoadingPromise;
+                } catch (error) {
+                    html2canvasLoadingPromise = null;
+                    throw error;
+                }
+            }
+
+            async function saveAsImage(e) {
+                const button = e.currentTarget || e.target.closest('.save-btn');
+                const originalHTML = button.innerHTML;
 
                 try {
                     button.textContent = '生成中...';
                     button.disabled = true;
+                    await ensureHtml2Canvas();
                     window.scrollTo(0, 0);
 
                     await new Promise(resolve => setTimeout(resolve, 200));
@@ -435,7 +490,7 @@ def render_rss_html_content(
                     const container = document.querySelector('.container');
 
                     const canvas = await html2canvas(container, {
-                        backgroundColor: '#ffffff',
+                        backgroundColor: '#f7f3eb',
                         scale: 1.5,
                         useCORS: true,
                         allowTaint: false,
@@ -468,16 +523,17 @@ def render_rss_html_content(
 
                     button.textContent = '保存成功!';
                     setTimeout(() => {
-                        button.textContent = originalText;
+                        button.innerHTML = originalHTML;
                         button.disabled = false;
                     }, 2000);
 
                 } catch (error) {
+                    console.error('RSS 图片导出失败:', error);
                     const buttons = document.querySelector('.save-buttons');
                     buttons.style.visibility = 'visible';
-                    button.textContent = '保存失败';
+                    button.textContent = error && error.message && error.message.indexOf('导出组件') !== -1 ? '组件加载失败' : '导出失败';
                     setTimeout(() => {
-                        button.textContent = originalText;
+                        button.innerHTML = originalHTML;
                         button.disabled = false;
                     }, 2000);
                 }

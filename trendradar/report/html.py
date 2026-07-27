@@ -61,7 +61,7 @@ def render_html_content(
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="theme-color" content="#5b21b6">
         <title>TrendRadar · AI 热点情报</title>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             * { box-sizing: border-box; }
             body {
@@ -1424,8 +1424,8 @@ def render_html_content(
                     <button class="toggle-dark-btn" onclick="toggleDarkMode()" title="切换暗色/亮色" aria-label="切换暗色或亮色主题"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 019.8 3.5 8.5 8.5 0 1020.5 14.2z"/></svg></button>
                     <div class="save-btn-group">
                         <button class="save-btn" onclick="saveAsImage(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M5 21h14"/></svg><span>导出</span></button>
-                        <button class="save-dropdown-trigger" aria-label="打开导出菜单"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
-                        <div class="save-dropdown-menu">
+                        <button class="save-dropdown-trigger" aria-label="打开导出菜单" aria-expanded="false" aria-controls="export-menu"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+                        <div class="save-dropdown-menu" id="export-menu">
                             <button class="save-dropdown-item" onclick="saveAsImage(event)"><svg class="dropdown-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><circle cx="8" cy="7.5" r="2.5"/><path d="M12 4h.01"/></svg>整页截图</button>
                             <button class="save-dropdown-item" onclick="saveAsMultipleImages(event)"><svg class="dropdown-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="10" height="10" rx="1.5"/><path d="M5 4V2.5A1.5 1.5 0 016.5 1h7A1.5 1.5 0 0115 2.5v7a1.5 1.5 0 01-1.5 1.5H12"/></svg>分段截图</button>
                             <button class="save-dropdown-item" onclick="saveAsMarkdown()"><svg class="dropdown-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 2h11A1.5 1.5 0 0115 3.5v9a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9A1.5 1.5 0 012.5 2z"/><path d="M4 11V5l2.5 3L9 5v6"/><path d="M11.5 8v3m0 0l-1.5-2m1.5 2l1.5-2"/></svg>Markdown</button>
@@ -2565,14 +2565,71 @@ def render_html_content(
 
             // ===== 截图功能 =====
 
+            var html2canvasLoadingPromise = null;
+
+            function loadExportScript(src) {
+                return new Promise(function(resolve, reject) {
+                    var script = document.createElement('script');
+                    var timer = setTimeout(function() {
+                        script.remove();
+                        reject(new Error('加载超时'));
+                    }, 12000);
+                    script.src = src;
+                    script.crossOrigin = 'anonymous';
+                    script.referrerPolicy = 'no-referrer';
+                    script.onload = function() {
+                        clearTimeout(timer);
+                        if (typeof window.html2canvas === 'function') resolve();
+                        else reject(new Error('脚本未提供 html2canvas'));
+                    };
+                    script.onerror = function() {
+                        clearTimeout(timer);
+                        script.remove();
+                        reject(new Error('脚本加载失败'));
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+
+            async function ensureHtml2Canvas() {
+                if (typeof window.html2canvas === 'function') return window.html2canvas;
+                if (html2canvasLoadingPromise) return html2canvasLoadingPromise;
+
+                html2canvasLoadingPromise = (async function() {
+                    var sources = [
+                        'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js',
+                        'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js',
+                        'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
+                    ];
+                    var lastError = null;
+                    for (var i = 0; i < sources.length; i++) {
+                        try {
+                            await loadExportScript(sources[i]);
+                            return window.html2canvas;
+                        } catch (error) {
+                            lastError = error;
+                        }
+                    }
+                    throw new Error('导出组件加载失败，请检查网络后重试。' + (lastError ? ' ' + lastError.message : ''));
+                })();
+
+                try {
+                    return await html2canvasLoadingPromise;
+                } catch (error) {
+                    html2canvasLoadingPromise = null;
+                    throw error;
+                }
+            }
+
             async function saveAsImage(e) {
-                const button = e.target.closest('.save-dropdown-item') || e.target;
+                const button = e.currentTarget || e.target.closest('.save-btn, .save-dropdown-item');
                 const originalHTML = button.innerHTML;
                 var screenshotState = null;
 
                 try {
                     button.textContent = '生成中...';
                     button.disabled = true;
+                    await ensureHtml2Canvas();
                     window.scrollTo(0, 0);
 
                     // 等待页面稳定
@@ -2591,7 +2648,7 @@ def render_html_content(
                     const container = document.querySelector('.container');
 
                     const canvas = await html2canvas(container, {
-                        backgroundColor: '#ffffff',
+                        backgroundColor: '#f7f3eb',
                         scale: 1.5,
                         useCORS: true,
                         allowTaint: false,
@@ -2631,10 +2688,11 @@ def render_html_content(
                     }, 2000);
 
                 } catch (error) {
+                    console.error('整页导出失败:', error);
                     const buttons = document.querySelector('.save-buttons');
                     buttons.style.visibility = 'visible';
                     if (screenshotState) { restoreAfterScreenshot(screenshotState); }
-                    button.textContent = '保存失败';
+                    button.textContent = error && error.message && error.message.indexOf('导出组件') !== -1 ? '组件加载失败' : '导出失败';
                     setTimeout(() => {
                         button.innerHTML = originalHTML;
                         button.disabled = false;
@@ -2643,7 +2701,7 @@ def render_html_content(
             }
 
             async function saveAsMultipleImages(e) {
-                const button = e.target.closest('.save-dropdown-item') || e.target;
+                const button = e.currentTarget || e.target.closest('.save-btn, .save-dropdown-item');
                 const originalHTML = button.innerHTML;
                 const container = document.querySelector('.container');
                 const scale = 1.5;
@@ -2651,9 +2709,10 @@ def render_html_content(
                 var screenshotState2 = null;
 
                 try {
-                    screenshotState2 = prepareForScreenshot();
                     button.textContent = '分析中...';
                     button.disabled = true;
+                    await ensureHtml2Canvas();
+                    screenshotState2 = prepareForScreenshot();
 
                     // 获取所有可能的分割元素
                     const newsItems = Array.from(container.querySelectorAll('.news-item'));
@@ -2797,7 +2856,7 @@ def render_html_content(
                             left: -9999px;
                             top: 0;
                             width: ${container.offsetWidth}px;
-                            background: white;
+                            background: #f7f3eb;
                         `;
                         tempContainer.className = 'container';
 
@@ -2818,7 +2877,7 @@ def render_html_content(
 
                         // 使用html2canvas截取特定区域
                         const canvas = await html2canvas(clonedContainer, {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: '#f7f3eb',
                             scale: scale,
                             useCORS: true,
                             allowTaint: false,
@@ -2937,6 +2996,36 @@ def render_html_content(
                     return line;
                 }
 
+                // AI 摘要优先，与网页阅读顺序保持一致
+                var aiSection = document.querySelector('.ai-section');
+                if (aiSection) {
+                    var aiError = aiSection.querySelector('.ai-error') || aiSection.querySelector('.ai-warning');
+                    var aiInfo = aiSection.querySelector('.ai-info');
+                    if (aiError) {
+                        lines.push('## AI 分析');
+                        lines.push('');
+                        lines.push('> ' + aiError.textContent.trim());
+                        lines.push('');
+                    } else if (!aiInfo) {
+                        var aiTitle = aiSection.querySelector('.ai-section-title');
+                        lines.push('## ' + (aiTitle ? aiTitle.textContent.trim() : 'AI 热点分析'));
+                        lines.push('');
+                        var aiBlocks = aiSection.querySelectorAll('.ai-block');
+                        aiBlocks.forEach(function(block) {
+                            var blockTitle = block.querySelector('.ai-block-title');
+                            var blockContent = block.querySelector('.ai-block-content');
+                            if (blockTitle) {
+                                lines.push('### ' + blockTitle.textContent.trim());
+                                lines.push('');
+                            }
+                            if (blockContent) {
+                                lines.push(blockContent.textContent.trim());
+                                lines.push('');
+                            }
+                        });
+                    }
+                }
+
                 // 热点关键词区
                 var wordGroups = document.querySelectorAll('.hotlist-section > .word-group');
                 if (wordGroups.length) {
@@ -3015,38 +3104,6 @@ def render_html_content(
                     });
                 }
 
-                // AI 热点分析区
-                var aiSection = document.querySelector('.ai-section');
-                if (aiSection) {
-                    var aiError = aiSection.querySelector('.ai-error') || aiSection.querySelector('.ai-warning');
-                    var aiInfo = aiSection.querySelector('.ai-info');
-                    if (aiError) {
-                        lines.push('## AI 分析');
-                        lines.push('');
-                        lines.push('> ' + aiError.textContent.trim());
-                        lines.push('');
-                    } else if (aiInfo) {
-                        // 跳过 info 提示（如"跳过"）
-                    } else {
-                        var aiTitle = aiSection.querySelector('.ai-section-title');
-                        lines.push('## ' + (aiTitle ? aiTitle.textContent.trim() : 'AI 热点分析'));
-                        lines.push('');
-                        var aiBlocks = aiSection.querySelectorAll('.ai-block');
-                        aiBlocks.forEach(function(block) {
-                            var blockTitle = block.querySelector('.ai-block-title');
-                            var blockContent = block.querySelector('.ai-block-content');
-                            if (blockTitle) {
-                                lines.push('### ' + blockTitle.textContent.trim());
-                                lines.push('');
-                            }
-                            if (blockContent) {
-                                lines.push(blockContent.textContent.trim());
-                                lines.push('');
-                            }
-                        });
-                    }
-                }
-
                 // 独立展示区（热榜平台 + RSS）
                 var standaloneSection = document.querySelector('.standalone-section');
                 if (standaloneSection) {
@@ -3094,15 +3151,46 @@ def render_html_content(
                 var link = document.createElement('a');
                 var filename = 'TrendRadar_' + dateStr + '_' + timeStr.replace(':', '') + '.md';
                 link.download = filename;
-                link.href = URL.createObjectURL(blob);
+                var blobUrl = URL.createObjectURL(blob);
+                link.href = blobUrl;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                URL.revokeObjectURL(link.href);
+                setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 1000);
             }
 
             document.addEventListener('DOMContentLoaded', function() {
                 window.scrollTo(0, 0);
+
+                // 导出菜单同时支持鼠标、键盘和移动端点击
+                var exportTrigger = document.querySelector('.save-dropdown-trigger');
+                var exportMenu = document.querySelector('.save-dropdown-menu');
+                if (exportTrigger && exportMenu) {
+                    exportTrigger.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var isOpen = exportMenu.classList.toggle('show');
+                        exportTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                    });
+                    exportMenu.addEventListener('click', function(e) {
+                        if (e.target.closest('.save-dropdown-item')) {
+                            exportMenu.classList.remove('show');
+                            exportTrigger.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                    document.addEventListener('click', function(e) {
+                        if (!e.target.closest('.save-btn-group')) {
+                            exportMenu.classList.remove('show');
+                            exportTrigger.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                    exportTrigger.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape') {
+                            exportMenu.classList.remove('show');
+                            exportTrigger.setAttribute('aria-expanded', 'false');
+                            exportTrigger.focus();
+                        }
+                    });
+                }
 
                 // 自动检测宽屏模式
                 var savedMode = null;
